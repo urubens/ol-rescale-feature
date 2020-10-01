@@ -73,20 +73,20 @@ In Browser environment you should add **script** tag pointing to **UMD** module 
 | :-------- | :------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | features  | _ol.Collection<ol.Feature>_                                                                        | The features the interaction works on. **Required**.                                                                                                                                        |
 | style     | _ol.style.Style &#124; Array&lt;ol.style.Style&gt; &#124; ol.style.StyleFunction &#124; undefined_ | Style of the overlay with interaction helper features.                                                                                                                                      |
-| angle     | _number &#124; undefined_                                                                          | Initial angle in radians (positive is counter-clockwise), applied for features already added to collection. Default is `0`.                                                                 |
+| factor    | _number &#124; undefined_                                                                          | Initial scaling factor, applied for features already added to collection. Default is `0`.                                                                                                   |
 | anchor    | _number[] &#124; ol.Coordinate &#124; undefined_                                                   | Initial anchor coordinate. Default is center of features extent.                                                                                                                            |
 | condition | _module:ol/events/condition~Condition_                                                             | A function that takes an `module:ol/MapBrowserEvent~MapBrowserEvent` and returns a boolean to indicate whether that event should be handled. Default is `module:ol/events/condition~always` |
 
 ### Methods
 
 ```js
-// Set current angle of interaction features.
-RescaleFeatureInteraction.prototype.setAngle(angle : number)
+// Set current scaling factor of interaction features.
+RescaleFeatureInteraction.prototype.setFactor(factor : number)
 ```
 
 ```js
-// Returns current angle of interaction features.
-RescaleFeatureInteraction.prototype.getAngle() : number
+// Returns current scaling factor of interaction features.
+RescaleFeatureInteraction.prototype.getFactor() : number
 ```
 
 ```js
@@ -106,7 +106,7 @@ All events triggered by the interaction are instances of `RescaleFeatureEvent`.
 ##### Members
 
 - **features**    _ol.Collection_     The features being rescaled.
-- **angle**       _number_            Current angle in radians.
+- **factor**      _number_            Current scaling factor.
 - **anchor**      _ol.Coordinate_     Current anchor position.
 
 | Event       | Arguments            | Description                          |
@@ -175,7 +175,7 @@ select.getFeatures().extend([ point, line, polygon ])
 const rescale = new RescaleFeatureInteraction({
   features: select.getFeatures(),
   anchor: [ 0, 0 ],
-  angle: -90 * Math.PI / 180
+  factor: -90 * Math.PI / 180
 })
 
 rescale.on('rescalestart', evt => console.log('rescale start', evt))
@@ -188,12 +188,12 @@ map.addInteraction(rescale)
 
 Example of usage in Browser environment in [test/umd.html](https://github.com/ghettovoice/ol-rotate-feature/tree/master/test/umd.html).
 
-Getting total angle or last anchor coordinates after rescaling:
+Getting total scaling factor or last anchor coordinates after rescaling:
 
 ```js
 rescale.on('rescaleend', evt => {
-    // get total angle in degrees
-    console.log(evt.angle + ' is '+ (-1 * evt.angle * 180 / Math.PI ) + '°')
+    // get total scaling factor in degrees
+    console.log(evt.factor + ' is '+ (-1 * evt.factor * 180 / Math.PI ) + '°')
     // get last anchor coordinates
     console.log(evt.anchor)
 })

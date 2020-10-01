@@ -61,7 +61,7 @@ select.getFeatures().extend([ point, line, polygon ])
 const rotate = new RescaleFeatureInteraction({
   features: select.getFeatures(),
   anchor: [ 0, 0 ],
-  angle: -90 * Math.PI / 180,
+  factor: -90 * Math.PI / 180,
   style: createStyle ()
 })
 
@@ -129,12 +129,12 @@ function createStyle () {
 
   return function (feature, resolution) {
     let style
-    let angle = feature.get('angle') || 0
+    let factor = feature.get('factor') || 0
 
     switch (true) {
       case feature.get('rescale-anchor'):
         style = styles[ 'anchor' ]
-        style[ 0 ].getImage().setRotation(-angle)
+        style[ 0 ].getImage().setRotation(-factor)
 
         return style
       case feature.get('rescale-arrow'):
@@ -147,11 +147,11 @@ function createStyle () {
           [ coordinates[ 0 ], coordinates[ 1 ] + 100 * resolution ]
         ])
 
-        // and rescale it according to current angle
-        geom.rotate(angle, coordinates)
+        // and rescale it according to current factor
+        geom.scale(factor, factor, coordinates)
         style[ 0 ].setGeometry(geom)
         style[ 1 ].setGeometry(geom)
-        style[ 0 ].getText().setText(Math.round(-angle * 180 / Math.PI) + '°')
+        style[ 0 ].getText().setText(Math.round(-factor * 180 / Math.PI) + '°')
 
         return style
     }

@@ -7,7 +7,7 @@
 /**
  * Rescale interaction class.
  * Adds controls to rescale vector features.
- * Writes out total angle in radians (positive is counter-clockwise) to property for each feature.
+ * Writes out total rescaling factor to property for each feature.
  */
 import PointerInteraction from 'ol/interaction/Pointer'
 import Collection from 'ol/Collection'
@@ -31,7 +31,7 @@ import { mouseActionButton } from './shim'
 const ANCHOR_KEY = 'rescale-anchor'
 const ARROW_KEY = 'rescale-arrow'
 
-const ANGLE_PROP = 'angle'
+const FACTOR_PROP = 'factor'
 const ANCHOR_PROP = 'anchor'
 
 /**
@@ -114,11 +114,11 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
     this.allowAnchorMovement = options.allowAnchorMovement === undefined ? true : options.allowAnchorMovement;
 
     this.setAnchor(options.anchor || getFeaturesCentroid(this.features_))
-    this.setAngle(options.angle || 0)
+    this.setFactor(options.factor || 0)
 
     this.features_.on('add', ::this.onFeatureAdd_)
     this.features_.on('remove', ::this.onFeatureRemove_)
-    this.on('change:' + ANGLE_PROP, ::this.onAngleChange_)
+    this.on('change:' + FACTOR_PROP, ::this.onFactorChange_)
     this.on('change:' + ANCHOR_PROP, ::this.onAnchorChange_)
 
     this.createOrUpdateAnchorFeature_()
@@ -135,15 +135,15 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
   /**
    * @type {number}
    */
-  get angle () {
-    return this.getAngle()
+  get factor () {
+    return this.getFactor()
   }
 
   /**
-   * @param {number} angle
+   * @param {number} factor
    */
-  set angle (angle) {
-    this.setAngle(angle)
+  set factor (factor) {
+    this.setFactor(factor)
   }
 
   /**
@@ -208,23 +208,23 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
   }
 
   /**
-   * Set current angle of interaction features.
+   * Set current scaling factor of interaction features.
    *
-   * @param {number} angle
+   * @param {number} factor
    */
-  setAngle (angle) {
-    assert(!isNaN(parseFloat(angle)), 'Numeric value passed')
+  setFactor (factor) {
+    assert(!isNaN(parseFloat(factor)), 'Numeric value passed')
 
-    this.set(ANGLE_PROP, parseFloat(angle))
+    this.set(FACTOR_PROP, parseFloat(factor))
   }
 
   /**
-   * Returns current angle of interaction features.
+   * Returns current scaling factor of interaction features.
    *
    * @return {number}
    */
-  getAngle () {
-    return this.get(ANGLE_PROP)
+  getFactor () {
+    return this.get(FACTOR_PROP)
   }
 
   /**
@@ -251,18 +251,18 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
    * @private
    */
   createOrUpdateAnchorFeature_ () {
-    const angle = this.getAngle()
+    const factor = this.getFactor()
     const anchor = this.getAnchor()
 
     if (!anchor) return
 
     if (this.anchorFeature_) {
       this.anchorFeature_.getGeometry().setCoordinates(anchor)
-      this.anchorFeature_.set(ANGLE_PROP, angle)
+      this.anchorFeature_.set(FACTOR_PROP, factor)
     } else {
       this.anchorFeature_ = new Feature({
         geometry: new Point(anchor),
-        [ ANGLE_PROP ]: angle,
+        [ FACTOR_PROP ]: factor,
         [ ANCHOR_KEY ]: true
       })
       this.overlay_.getSource().addFeature(this.anchorFeature_)
@@ -273,18 +273,18 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
    * @private
    */
   createOrUpdateArrowFeature_ () {
-    const angle = this.getAngle()
+    const factor = this.getFactor()
     const anchor = this.getAnchor()
 
     if (!anchor) return
 
     if (this.arrowFeature_) {
       this.arrowFeature_.getGeometry().setCoordinates(anchor)
-      this.arrowFeature_.set(ANGLE_PROP, angle)
+      this.arrowFeature_.set(FACTOR_PROP, factor)
     } else {
       this.arrowFeature_ = new Feature({
         geometry: new Point(anchor),
-        [ ANGLE_PROP ]: angle,
+        [ FACTOR_PROP ]: factor,
         [ ARROW_KEY ]: true
       })
       this.overlay_.getSource().addFeature(this.arrowFeature_)
@@ -294,18 +294,18 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
   /**
    * @private
    */
-  resetAngleAndAnchor_() {
-    this.resetAngle_();
+  resetFactorAndAnchor_() {
+    this.resetFactor_();
     this.resetAnchor_();
   }
 
   /**
    * @private
    */
-  resetAngle_() {
-    this.set(ANGLE_PROP, 0, true);
-    this.arrowFeature_ && this.arrowFeature_.set(ANGLE_PROP, this.getAngle());
-    this.anchorFeature_ && this.anchorFeature_.set(ANGLE_PROP, this.getAngle());
+  resetFactor_() {
+    this.set(FACTOR_PROP, 0, true);
+    this.arrowFeature_ && this.arrowFeature_.set(FACTOR_PROP, this.getFactor());
+    this.anchorFeature_ && this.anchorFeature_.set(FACTOR_PROP, this.getFactor());
   }
 
   /**
@@ -324,7 +324,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
    * @private
    */
   onFeatureAdd_ () {
-    this.resetAngleAndAnchor_()
+    this.resetFactorAndAnchor_()
     this.createOrUpdateAnchorFeature_()
     this.createOrUpdateArrowFeature_()
   }
@@ -333,7 +333,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
    * @private
    */
   onFeatureRemove_ () {
-    this.resetAngleAndAnchor_()
+    this.resetFactorAndAnchor_()
 
     if (this.features_.getLength()) {
       this.createOrUpdateAnchorFeature_()
@@ -347,10 +347,10 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
   /**
    * @private
    */
-  onAngleChange_({ oldValue }) {
-    this.features_.forEach(feature => feature.getGeometry().rotate(this.getAngle() - oldValue, this.getAnchor()))
-    this.arrowFeature_ && this.arrowFeature_.set(ANGLE_PROP, this.getAngle())
-    this.anchorFeature_ && this.anchorFeature_.set(ANGLE_PROP, this.getAngle())
+  onFactorChange_({ oldValue }) {
+    this.features_.forEach(feature => feature.getGeometry().rotate(this.getFactor() - oldValue, this.getAnchor()))
+    this.arrowFeature_ && this.arrowFeature_.set(FACTOR_PROP, this.getFactor())
+    this.anchorFeature_ && this.anchorFeature_.set(FACTOR_PROP, this.getFactor())
   }
 
   /**
@@ -374,7 +374,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
       new RescaleFeatureEvent(
         RescaleFeatureEventType.START,
         features,
-        this.getAngle(),
+        this.getFactor(),
         this.getAnchor()
       )
     )
@@ -389,7 +389,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
       new RescaleFeatureEvent(
         RescaleFeatureEventType.RESCALING,
         features,
-        this.getAngle(),
+        this.getFactor(),
         this.getAnchor()
       )
     )
@@ -404,7 +404,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
       new RescaleFeatureEvent(
         RescaleFeatureEventType.END,
         features,
-        this.getAngle(),
+        this.getFactor(),
         this.getAnchor()
       )
     )
@@ -512,7 +512,7 @@ function handleUpEvent (evt) {
 function handleDragEvent ({ coordinate }) {
   const anchorCoordinate = this.anchorFeature_.getGeometry().getCoordinates()
 
-  // handle drag of features by angle
+  // handle drag of features by scaling factor
   if (this.lastCoordinate_) {
     // calculate vectors of last and current pointer positions
     const lastVector = [
@@ -530,7 +530,7 @@ function handleDragEvent ({ coordinate }) {
       lastVector[ 0 ] * newVector[ 0 ] + lastVector[ 1 ] * newVector[ 1 ]
     )
 
-    this.setAngle(this.getAngle() + angle)
+    this.setFactor(this.getFactor() + angle)
     this.dispatchRescalingEvent_(this.features_)
 
     this.lastCoordinate_ = coordinate
@@ -646,12 +646,12 @@ function getDefaultStyle () {
 
   return function (feature, resolution) {
     let style
-    const angle = feature.get(ANGLE_PROP) || 0
+    const factor = feature.get(FACTOR_PROP) || 0
 
     switch (true) {
       case feature.get(ANCHOR_KEY):
         style = styles[ ANCHOR_KEY ]
-        style[ 0 ].getImage().setRotation(-angle)
+        style[ 0 ].getImage().setRotation(-factor)
 
         return style
       case feature.get(ARROW_KEY):
@@ -669,11 +669,11 @@ function getDefaultStyle () {
           ]
         ])
 
-        // and rescale it according to current angle
-        geom.rotate(angle, coordinates)
+        // and rescale it according to current scaling factor
+        geom.rotate(factor, coordinates)
         style[ 0 ].setGeometry(geom)
         style[ 1 ].setGeometry(geom)
-        style[ 0 ].getText().setText(Math.round(-angle * 180 / Math.PI) + '°')
+        style[ 0 ].getText().setText(Math.round(-factor * 180 / Math.PI) + '°')
 
         return style
     }

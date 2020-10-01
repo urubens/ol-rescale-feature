@@ -35,10 +35,10 @@ export default class RescaleFeatureEvent {
   /**
    * @param {string} type Type.
    * @param {ol.Collection<ol.Feature>} features Rescaled features.
-   * @param {number} angle Angle in radians.
+   * @param {number} factor Scaling factor.
    * @param {ol.Coordinate} anchor Anchor position.
    */
-  constructor (type, features, angle, anchor) {
+  constructor (type, features, factor, anchor) {
     /**
      * @type {boolean}
      * @private
@@ -59,11 +59,11 @@ export default class RescaleFeatureEvent {
      */
     this.features_ = features
     /**
-     * Current angle in radians.
+     * Current scaling factor.
      * @type {number}
      * @private
      */
-    this.angle_ = angle
+    this.factor_ = factor
     /**
      * Current rescaling anchor.
      * @type {ol.Coordinate}
@@ -96,8 +96,8 @@ export default class RescaleFeatureEvent {
   /**
    * @type {number}
    */
-  get angle () {
-    return this.angle_
+  get factor () {
+    return this.factor_
   }
 
   /**

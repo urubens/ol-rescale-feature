@@ -75,7 +75,7 @@ describe('rotate feature interaction', function () {
 
       expect(rotate.features).to.be.instanceof(Collection)
       expect(rotate.features.getLength()).to.be.equal(0)
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.undefined
     })
 
@@ -89,7 +89,7 @@ describe('rotate feature interaction', function () {
       expect(rotate.features).to.be.instanceof(Collection)
       expect(rotate.features.getLength()).to.be.equal(2)
       expect(rotate.features.getArray().every((feature, i) => feature === features[ i ])).to.be.true
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.deep.equal([ 5, 5 ])
     })
 
@@ -102,16 +102,16 @@ describe('rotate feature interaction', function () {
 
       expect(rotate.features).to.be.equal(features)
       expect(rotate.features.getLength()).to.be.equal(2)
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.deep.equal([ -7.5, -7.5 ])
     })
 
-    it('should initialize with initial angle and anchor', () => {
-      const angle = 90 * Math.PI / 180
+    it('should initialize with initial factor and anchor', () => {
+      const factor = 90 * Math.PI / 180
       const anchor = [ 10, 10 ]
-      const rotate = new RescaleFeatureInteraction({ angle, anchor })
+      const rotate = new RescaleFeatureInteraction({ factor, anchor })
 
-      expect(rotate.angle).to.be.equal(angle)
+      expect(rotate.factor).to.be.equal(factor)
       expect(rotate.anchor).to.be.deep.equal(anchor)
     })
   })
@@ -221,15 +221,15 @@ describe('rotate feature interaction', function () {
   })
 
   /**
-   * @test RescaleFeatureInteraction#setAngle
-   * @test RescaleFeatureInteraction#getAngle
+   * @test RescaleFeatureInteraction#setFactor
+   * @test RescaleFeatureInteraction#getFactor
    */
-  describe('angle setter/getter', () => {
+  describe('factor setter/getter', () => {
     it('should throw on invalid value', () => {
-      expect(() => new RescaleFeatureInteraction({ angle: 'qwerty' })).to.throw(Error, /numeric value passed/i)
+      expect(() => new RescaleFeatureInteraction({ factor: 'qwerty' })).to.throw(Error, /numeric value passed/i)
 
       const rotate = new RescaleFeatureInteraction()
-      expect(() => { rotate.angle = 'qwerty' }).to.throw(Error, /numeric value passed/i)
+      expect(() => { rotate.factor = 'qwerty' }).to.throw(Error, /numeric value passed/i)
     })
 
     it('should get/set through ES5 setter/getter', () => {
@@ -237,17 +237,17 @@ describe('rotate feature interaction', function () {
       sinon.spy(point, 'rotate')
 
       const rotate = new RescaleFeatureInteraction({
-        angle: -90 * Math.PI / 180,
+        factor: -90 * Math.PI / 180,
         anchor: [ 0, 0 ],
         features: [ new Feature(point) ]
       })
-      expect(rotate.angle).to.be.equal(-90 * Math.PI / 180)
-      expect(rotate.arrowFeature.get('angle')).to.be.equal(-90 * Math.PI / 180)
+      expect(rotate.factor).to.be.equal(-90 * Math.PI / 180)
+      expect(rotate.arrowFeature.get('factor')).to.be.equal(-90 * Math.PI / 180)
       expect(point.getCoordinates()).to.be.deep.equal([ 10, 10 ])
 
-      rotate.angle = 90 * Math.PI / 180
-      expect(rotate.angle).to.be.equal(90 * Math.PI / 180)
-      expect(rotate.arrowFeature.get('angle')).to.be.equal(90 * Math.PI / 180)
+      rotate.factor = 90 * Math.PI / 180
+      expect(rotate.factor).to.be.equal(90 * Math.PI / 180)
+      expect(rotate.arrowFeature.get('factor')).to.be.equal(90 * Math.PI / 180)
       expect(point.getCoordinates().map(x => parseFloat(x.toPrecision(6)))).to.be.deep.equal([ -10, -10 ])
       expect(point.rotate).to.be.calledWith(Math.PI, [ 0, 0 ])
 
@@ -282,49 +282,49 @@ describe('rotate feature interaction', function () {
   })
 
   describe('features collection listener', () => {
-    it('should update anchor/angle/internal features on feature add', () => {
+    it('should update anchor/factor/internal features on feature add', () => {
       const rotate = new RescaleFeatureInteraction()
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.undefined
       expect(rotate.arrowFeature).to.be.undefined
       expect(rotate.anchorFeature).to.be.undefined
 
       rotate.features.push(new Feature(new Point([ 10, 10 ])))
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.deep.equal([ 10, 10 ])
-      expect(rotate.arrowFeature.get('angle')).to.be.equal(0)
+      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
       expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 10, 10 ])
 
-      rotate.angle = 90 * Math.PI / 180
+      rotate.factor = 90 * Math.PI / 180
       rotate.features.push(new Feature(new Point([ 5, 5 ])))
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.deep.equal([ 7.5, 7.5 ])
-      expect(rotate.arrowFeature.get('angle')).to.be.equal(0)
+      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
       expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 7.5, 7.5 ])
     })
 
-    it('should update anchor/angle/internal features on feature remove', () => {
+    it('should update anchor/factor/internal features on feature remove', () => {
       const rotate = new RescaleFeatureInteraction({
         features: [
           new Feature(new Point([ 10, 10 ])),
           new Feature(new Point([ 5, 5 ]))
         ]
       })
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.deep.equal([ 7.5, 7.5 ])
-      expect(rotate.arrowFeature.get('angle')).to.be.equal(0)
+      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
       expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 7.5, 7.5 ])
 
-      rotate.angle = 90 * Math.PI / 180
+      rotate.factor = 90 * Math.PI / 180
       rotate.features.pop()
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.deep.equal([ 5, 10 ])
-      expect(rotate.arrowFeature.get('angle')).to.be.equal(0)
+      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
       expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 5, 10 ])
 
-      rotate.angle = 1
+      rotate.factor = 1
       rotate.features.pop()
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
       expect(rotate.anchor).to.be.undefined
       expect(rotate.arrowFeature).to.be.undefined
       expect(rotate.anchorFeature).to.be.undefined
@@ -348,7 +348,7 @@ describe('rotate feature interaction', function () {
       const listener = trackEvents(features.item(0).getGeometry(), rotate)
 
       expect(rotate.anchor).to.be.deep.equal([ 10, 10 ])
-      expect(rotate.angle).to.be.equal(0)
+      expect(rotate.factor).to.be.equal(0)
 
       // simulate rescaling to 45deg around [ 10, 10 ] anchor
       let startPixel = map.getPixelFromCoordinate(features.item(0).getGeometry().getCoordinates())
@@ -370,7 +370,7 @@ describe('rotate feature interaction', function () {
 
       expect(calls[ 0 ].args[ 0 ]).to.be.an.instanceof(RescaleFeatureEvent)
       expect(calls[ 0 ].args[ 0 ].type).to.be.equal('rescalestart')
-      expect(calls[ 0 ].args[ 0 ].angle).to.be.equal(0)
+      expect(calls[ 0 ].args[ 0 ].factor).to.be.equal(0)
       expect(calls[ 0 ].args[ 0 ].anchor).to.be.deep.equal([ 10, 10 ])
       expect(calls[ 0 ].args[ 0 ].features).to.be.deep.equal(features)
 
@@ -379,13 +379,13 @@ describe('rotate feature interaction', function () {
 
       expect(calls[ 2 ].args[ 0 ]).to.be.an.instanceof(RescaleFeatureEvent)
       expect(calls[ 2 ].args[ 0 ].type).to.be.equal('rescaling')
-      expect(satisfyError(calls[ 2 ].args[ 0 ].angle, 90 * Math.PI / 180)).to.be.true
+      expect(satisfyError(calls[ 2 ].args[ 0 ].factor, 90 * Math.PI / 180)).to.be.true
       expect(calls[ 2 ].args[ 0 ].anchor).to.be.deep.equal([ 10, 10 ])
       expect(calls[ 2 ].args[ 0 ].features).to.be.deep.equal(features)
 
       expect(calls[ 3 ].args[ 0 ]).to.be.an.instanceof(RescaleFeatureEvent)
       expect(calls[ 3 ].args[ 0 ].type).to.be.equal('rescaleend')
-      expect(satisfyError(calls[ 3 ].args[ 0 ].angle, 90 * Math.PI / 180)).to.be.true
+      expect(satisfyError(calls[ 3 ].args[ 0 ].factor, 90 * Math.PI / 180)).to.be.true
       expect(calls[ 3 ].args[ 0 ].anchor).to.be.deep.equal([ 10, 10 ])
       expect(calls[ 3 ].args[ 0 ].features).to.be.deep.equal(features)
     })
