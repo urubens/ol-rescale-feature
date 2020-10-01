@@ -1,7 +1,7 @@
 {
-  "name": "ol-rotate-feature",
+  "name": "ol-rescale-feature",
   "version": "2.2.1",
-  "description": "Rotate vector features interaction for OpenLayers",
+  "description": "Rescale vector features interaction for OpenLayers",
   "main": "dist/bundle.js",
   "module": "dist/bundle.es.js",
   "scripts": {
@@ -16,8 +16,8 @@
   "keywords": [
     "ol",
     "openlayers",
-    "ol-rotate-feature",
-    "rotate feature",
+    "ol-rescale-feature",
+    "rescale feature",
     "transform feature",
     "map",
     "mapping"

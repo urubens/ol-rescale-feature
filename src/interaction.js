@@ -1,12 +1,12 @@
 /**
- * This file is part of ol-rotate-feature package.
- * @module ol-rotate-feature
+ * This file is part of ol-rescale-feature package.
+ * @module ol-rescale-feature
  * @license MIT
  * @author Vladimir Vershinin
  */
 /**
- * Rotate interaction class.
- * Adds controls to rotate vector features.
+ * Rescale interaction class.
+ * Adds controls to rescale vector features.
  * Writes out total angle in radians (positive is counter-clockwise) to property for each feature.
  */
 import PointerInteraction from 'ol/interaction/Pointer'
@@ -25,11 +25,11 @@ import Text from 'ol/style/Text'
 import {getCenter as getExtentCenter} from 'ol/extent'
 import { always, mouseOnly } from 'ol/events/condition';
 import { assert, identity, includes, isArray } from './util'
-import RotateFeatureEvent, { RotateFeatureEventType } from './event'
+import RescaleFeatureEvent, { RescaleFeatureEventType } from './event'
 import { mouseActionButton } from './shim'
 
-const ANCHOR_KEY = 'rotate-anchor'
-const ARROW_KEY = 'rotate-arrow'
+const ANCHOR_KEY = 'rescale-anchor'
+const ARROW_KEY = 'rescale-arrow'
 
 const ANGLE_PROP = 'angle'
 const ANCHOR_PROP = 'anchor'
@@ -37,7 +37,7 @@ const ANCHOR_PROP = 'anchor'
 /**
  * @todo todo добавить опцию condition - для возможности переопределения клавиш
  */
-export default class RotateFeatureInteraction extends PointerInteraction {
+export default class RescaleFeatureInteraction extends PointerInteraction {
   /**
    * @param {InteractionOptions} options
    */
@@ -369,10 +369,10 @@ export default class RotateFeatureInteraction extends PointerInteraction {
    * @param {Collection<Feature>} features
    * @private
    */
-  dispatchRotateStartEvent_ (features) {
+  dispatchRescaleStartEvent_ (features) {
     this.dispatchEvent(
-      new RotateFeatureEvent(
-        RotateFeatureEventType.START,
+      new RescaleFeatureEvent(
+        RescaleFeatureEventType.START,
         features,
         this.getAngle(),
         this.getAnchor()
@@ -384,10 +384,10 @@ export default class RotateFeatureInteraction extends PointerInteraction {
    * @param {Collection<Feature>} features
    * @private
    */
-  dispatchRotatingEvent_ (features) {
+  dispatchRescalingEvent_ (features) {
     this.dispatchEvent(
-      new RotateFeatureEvent(
-        RotateFeatureEventType.ROTATING,
+      new RescaleFeatureEvent(
+        RescaleFeatureEventType.RESCALING,
         features,
         this.getAngle(),
         this.getAnchor()
@@ -399,10 +399,10 @@ export default class RotateFeatureInteraction extends PointerInteraction {
    * @param {Collection<Feature>} features
    * @private
    */
-  dispatchRotateEndEvent_ (features) {
+  dispatchRescaleEndEvent_ (features) {
     this.dispatchEvent(
-      new RotateFeatureEvent(
-        RotateFeatureEventType.END,
+      new RescaleFeatureEvent(
+        RescaleFeatureEventType.END,
         features,
         this.getAngle(),
         this.getAnchor()
@@ -414,7 +414,7 @@ export default class RotateFeatureInteraction extends PointerInteraction {
 /**
  * @param {MapBrowserEvent} evt Map browser event.
  * @return {boolean} `false` to stop event propagation.
- * @this {RotateFeatureInteraction}
+ * @this {RescaleFeatureInteraction}
  * @private
  */
 // function handleEvent (evt) {
@@ -433,7 +433,7 @@ export default class RotateFeatureInteraction extends PointerInteraction {
 /**
  * @param {MapBrowserEvent} evt Event.
  * @return {boolean}
- * @this {RotateFeatureInteraction}
+ * @this {RescaleFeatureInteraction}
  * @private
  */
 function handleDownEvent (evt) {
@@ -450,7 +450,7 @@ function handleDownEvent (evt) {
     ) {
       return false
     }
-    // handle click & drag on features for rotation
+    // handle click & drag on features for rescaling
     if (
       foundFeature && !this.lastCoordinate_ &&
       (
@@ -461,11 +461,11 @@ function handleDownEvent (evt) {
       this.lastCoordinate_ = evt.coordinate
 
       this::handleMoveEvent(evt)
-      this.dispatchRotateStartEvent_(this.features_)
+      this.dispatchRescaleStartEvent_(this.features_)
 
       return true
     }
-    // handle click & drag on rotation anchor feature
+    // handle click & drag on rescaling anchor feature
     else if (foundFeature && foundFeature === this.anchorFeature_ && this.allowAnchorMovement) {
       this.anchorMoving_ = true
       this::handleMoveEvent(evt)
@@ -479,7 +479,7 @@ function handleDownEvent (evt) {
 /**
  * @param {MapBrowserEvent} evt Event.
  * @return {boolean}
- * @this {RotateFeatureInteraction}
+ * @this {RescaleFeatureInteraction}
  * @private
  */
 function handleUpEvent (evt) {
@@ -488,7 +488,7 @@ function handleUpEvent (evt) {
     this.lastCoordinate_ = undefined
 
     this::handleMoveEvent(evt)
-    this.dispatchRotateEndEvent_(this.features_)
+    this.dispatchRescaleEndEvent_(this.features_)
 
     return true
   }
@@ -506,7 +506,7 @@ function handleUpEvent (evt) {
 /**
  * @param {MapBrowserEvent} evt Event.
  * @return {boolean}
- * @this {RotateFeatureInteraction}
+ * @this {RescaleFeatureInteraction}
  * @private
  */
 function handleDragEvent ({ coordinate }) {
@@ -531,7 +531,7 @@ function handleDragEvent ({ coordinate }) {
     )
 
     this.setAngle(this.getAngle() + angle)
-    this.dispatchRotatingEvent_(this.features_)
+    this.dispatchRescalingEvent_(this.features_)
 
     this.lastCoordinate_ = coordinate
   }
@@ -544,7 +544,7 @@ function handleDragEvent ({ coordinate }) {
 /**
  * @param {MapBrowserEvent} evt Event.
  * @return {boolean}
- * @this {RotateFeatureInteraction}
+ * @this {RescaleFeatureInteraction}
  * @private
  */
 function handleMoveEvent ({ map, pixel }) {
@@ -669,7 +669,7 @@ function getDefaultStyle () {
           ]
         ])
 
-        // and rotate it according to current angle
+        // and rescale it according to current angle
         geom.rotate(angle, coordinates)
         style[ 0 ].setGeometry(geom)
         style[ 1 ].setGeometry(geom)

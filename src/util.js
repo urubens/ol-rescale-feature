@@ -1,6 +1,6 @@
 /**
- * This file is part of ol-rotate-feature package.
- * @module ol-rotate-feature
+ * This file is part of ol-rescale-feature package.
+ * @module ol-rescale-feature
  * @license MIT
  * @author Vladimir Vershinin
  */

@@ -1,6 +1,6 @@
 /**
- * This file is part of ol-rotate-feature package.
- * @module ol-rotate-feature
+ * This file is part of ol-rescale-feature package.
+ * @module ol-rescale-feature
  * @license MIT
  * @author Vladimir Vershinin
  */
@@ -13,5 +13,5 @@
  *                                      applied for features already added to collection. Default is `0`.
  * @property {number[] | ol.Coordinate | undefined} anchor Initial anchor coordinate. Default is center of features extent.
  * @property {function} condition
- * @property {boolean | undefined} allowAnchorMovement Allow UI manipulaiton of the Rotation Anchor
+ * @property {boolean | undefined} allowAnchorMovement Allow UI manipulaiton of the Rescaling Anchor
  */

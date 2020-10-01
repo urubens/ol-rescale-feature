@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ol-rotate-feature UMD</title>
+  <title>ol-rescale-feature UMD</title>
   <style>
     html, body, #map {
       width   : 100%;
@@ -62,15 +62,15 @@
     var select = new ol.interaction.Select()
     select.getFeatures().extend([ point, line, polygon ])
 
-    var rotate = new RotateFeatureInteraction({
+    var rotate = new RescaleFeatureInteraction({
       features: select.getFeatures(),
       angle: -1.5708,
       style: createStyle()
     })
 
-    rotate.on('rotatestart', evt => console.log('rotate start', evt))
-    rotate.on('rotating', evt => console.log('rotating', evt))
-    rotate.on('rotateend', evt => console.log('rotate end', evt))
+    rotate.on('rescalestart', evt => console.log('rescale start', evt))
+    rotate.on('rescaling', evt => console.log('rescaling', evt))
+    rotate.on('rescaleend', evt => console.log('rescale end', evt))
 
     map.addInteraction(select)
     map.addInteraction(rotate)
@@ -136,12 +136,12 @@
         var angle = feature.get('angle') || 0
 
         switch (true) {
-          case feature.get('rotate-anchor'):
+          case feature.get('rescale-anchor'):
             style = styles[ 'anchor' ]
             style[ 0 ].getImage().setRotation(-angle)
 
             return style
-          case feature.get('rotate-arrow'):
+          case feature.get('rescale-arrow'):
             style = styles[ 'arrow' ]
 
             var coordinates = feature.getGeometry().getCoordinates()
@@ -151,7 +151,7 @@
               [ coordinates[ 0 ], coordinates[ 1 ] + 100 * resolution ]
             ])
 
-            // and rotate it according to current angle
+            // and rescale it according to current angle
             geom.rotate(angle, coordinates)
             style[ 0 ].setGeometry(geom)
             style[ 1 ].setGeometry(geom)

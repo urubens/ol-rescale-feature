@@ -1,40 +1,40 @@
 /**
- * This file is part of ol-rotate-feature package.
- * @module ol-rotate-feature
+ * This file is part of ol-rescale-feature package.
+ * @module ol-rescale-feature
  * @license MIT
  * @author Vladimir Vershinin
  */
 /**
  * @enum {string}
  */
-export const RotateFeatureEventType = {
+export const RescaleFeatureEventType = {
   /**
-   * Triggered upon feature rotate start.
-   * @event RotateFeatureEvent#rotatestart
+   * Triggered upon feature rescale start.
+   * @event RescaleFeatureEvent#rescalestart
    */
-  START: 'rotatestart',
+  START: 'rescalestart',
   /**
-   * Triggered upon feature rotation.
-   * @event RotateFeatureEvent#rotating
+   * Triggered upon feature rescaling.
+   * @event RescaleFeatureEvent#rescaling
    */
-  ROTATING: 'rotating',
+  RESCALING: 'rescaling',
   /**
-   * Triggered upon feature rotation end.
-   * @event RotateFeatureEvent#rotateend
+   * Triggered upon feature rescaling end.
+   * @event RescaleFeatureEvent#rescaleend
    */
-  END: 'rotateend'
+  END: 'rescaleend'
 }
 
 /**
- * Events emitted by RotateFeatureInteraction instances are instances of this type.
+ * Events emitted by RescaleFeatureInteraction instances are instances of this type.
  *
  * @class
  * @author Vladimir Vershinin
  */
-export default class RotateFeatureEvent {
+export default class RescaleFeatureEvent {
   /**
    * @param {string} type Type.
-   * @param {ol.Collection<ol.Feature>} features Rotated features.
+   * @param {ol.Collection<ol.Feature>} features Rescaled features.
    * @param {number} angle Angle in radians.
    * @param {ol.Coordinate} anchor Anchor position.
    */
@@ -53,7 +53,7 @@ export default class RotateFeatureEvent {
     this.type_ = type
 
     /**
-     * The features being rotated.
+     * The features being rescaled.
      * @type {ol.Collection<ol.Feature>}
      * @private
      */
@@ -65,7 +65,7 @@ export default class RotateFeatureEvent {
      */
     this.angle_ = angle
     /**
-     * Current rotation anchor.
+     * Current rescaling anchor.
      * @type {ol.Coordinate}
      * @private
      */
@@ -80,7 +80,7 @@ export default class RotateFeatureEvent {
   }
 
   /**
-   * @type {RotateFeatureEventType}
+   * @type {RescaleFeatureEventType}
    */
   get type () {
     return this.type_

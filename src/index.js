@@ -1,14 +1,14 @@
 /**
- * This file is part of ol-rotate-feature package.
- * @module ol-rotate-feature
+ * This file is part of ol-rescale-feature package.
+ * @module ol-rescale-feature
  * @license MIT
  * @author Vladimir Vershinin
  */
-import RotateFeatureInteraction from "./interaction"
+import RescaleFeatureInteraction from "./interaction"
 
 // for backward compatibility
 if (typeof window !== 'undefined' && window.ol) {
-  window.ol.interaction.RotateFeature = RotateFeatureInteraction
+  window.ol.interaction.RescaleFeature = RescaleFeatureInteraction
 }
 
-export default RotateFeatureInteraction
+export default RescaleFeatureInteraction

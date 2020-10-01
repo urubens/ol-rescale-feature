@@ -4,13 +4,13 @@
 [![view on npm](http://img.shields.io/npm/v/ol-rotate-feature.svg)](https://www.npmjs.org/package/ol-rotate-feature)
 [![License](https://img.shields.io/github/license/ghettovoice/ol-rotate-feature.svg)](https://github.com/ghettovoice/ol-rotate-feature/blob/master/LICENSE)
 
-# Rotate feature interaction for OpenLayers
+# Rescale feature interaction for OpenLayers
 
 Plugin adds interaction that allows to rotate vector features around some anchor.
 
 ### [Demo](https://ghettovoice.github.io/ol-rotate-feature/demo.html)
 
-**NOTE**: `ol-rotate-feature` starting from version **v2.x** supports `ol` **v5.x**. To use it with previous version of the OpenLayers `ol` package
+**NOTE**: `ol-rescale-feature` starting from version **v2.x** supports `ol` **v5.x**. To use it with previous version of the OpenLayers `ol` package
 you should install **v1.x** version.
 
 ## Installation
@@ -19,7 +19,7 @@ Install it thought NPM (**recommended**):
 
 ```shell
 # ES6 version for bundling with Webpack, Rollup or etc.
-npm install ol ol-rotate-feature
+npm install ol ol-rescale-feature
 
 # to use UMD version 'openlayers' package should be installed (not recommended)
 npm install openlayers
@@ -29,7 +29,7 @@ Or add from CDN:
 
 ```html
 <script src="https://unpkg.com/openlayers@latest/dist/ol.js"></script>
-<script src="https://unpkg.com/ol-rotate-feature@latest/dist/bundle.min.js"></script>
+<script src="https://unpkg.com/ol-rescale-feature@latest/dist/bundle.min.js"></script>
 ```
 
 ### Note
@@ -46,7 +46,7 @@ Plugin may be used as **ES2015** module and **`ol` v5.x** (**recommended**):
 ```js
 import Map from 'ol/Map'
 ...
-import RotateFeatureInteraction from 'ol-rotate-feature'
+import RescaleFeatureInteraction from 'ol-rescale-feature'
 ```
 
 Use **UMD** bundle with deprecated **`openlayers` v4.x** package (**not recommended but supported**)
@@ -54,16 +54,16 @@ Use **UMD** bundle with deprecated **`openlayers` v4.x** package (**not recommen
 ```js
 const ol = require('openlayers')
 ...
-const RotateFeatureInteraction = require('ol-rotate-feature')
+const RescaleFeatureInteraction = require('ol-rescale-feature')
 ```
 
 In Browser environment you should add **script** tag pointing to **UMD** module after OpenLayers js files.
 ```html
 <script src="https://unpkg.com/openlayers@latest/dist/ol.js"></script>
-<script src="https://unpkg.com/ol-rotate-feature@latest/dist/bundle.min.js"></script>
+<script src="https://unpkg.com/ol-rescale-feature@latest/dist/bundle.min.js"></script>
 <script>
-  // plugin exports global variable RotateFeatureInteraction
-  // in addition it also exported to `ol.interaction.RotateFeature` field (for backward compatibility).
+  // plugin exports global variable RescaleFeatureInteraction
+  // in addition it also exported to `ol.interaction.RescaleFeature` field (for backward compatibility).
 </script>
 ```
 
@@ -81,39 +81,39 @@ In Browser environment you should add **script** tag pointing to **UMD** module 
 
 ```js
 // Set current angle of interaction features.
-RotateFeatureInteraction.prototype.setAngle(angle : number)
+RescaleFeatureInteraction.prototype.setAngle(angle : number)
 ```
 
 ```js
 // Returns current angle of interaction features.
-RotateFeatureInteraction.prototype.getAngle() : number
+RescaleFeatureInteraction.prototype.getAngle() : number
 ```
 
 ```js
 // Set current anchor position.
-RotateFeatureInteraction.prototype.setAnchor(anchor? : number[] | ol.Coordinate)
+RescaleFeatureInteraction.prototype.setAnchor(anchor? : number[] | ol.Coordinate)
 ```
 
 ```js
 // Returns current anchor position.
-RotateFeatureInteraction.prototype.getAnchor() : number[] | ol.Coordinate | undefined 
+RescaleFeatureInteraction.prototype.getAnchor() : number[] | ol.Coordinate | undefined 
 ```
 
 ### Events
 
-All events triggered by the interaction are instances of `RotateFeatureEvent`.
+All events triggered by the interaction are instances of `RescaleFeatureEvent`.
 
 ##### Members
 
-- **features**    _ol.Collection_     The features being rotated.
+- **features**    _ol.Collection_     The features being rescaled.
 - **angle**       _number_            Current angle in radians.
 - **anchor**      _ol.Coordinate_     Current anchor position.
 
 | Event       | Arguments            | Description                          |
 | :---------- | :------------------- | :----------------------------------- |
-| rotatestart | _RotateFeatureEvent_ | Triggered upon feature rotate start. |
-| rotating    | _RotateFeatureEvent_ | Triggered upon feature rotating.     |
-| rotateend   | _RotateFeatureEvent_ | Triggered upon feature rotation end. |
+| rescalestart | _RescaleFeatureEvent_ | Triggered upon feature rescale start. |
+| rescaling    | _RescaleFeatureEvent_ | Triggered upon feature rescaling.     |
+| rescaleend   | _RescaleFeatureEvent_ | Triggered upon feature rescaling end. |
 
 ### Example usage:
 
@@ -129,7 +129,7 @@ import Point from 'ol/geom/Point'
 import LineString from 'ol/geom/LineString'
 import Polygon from 'ol/geom/Polygon'
 import Select from 'ol/interaction/Select'
-import RotateFeatureInteraction from 'ol-rotate-feature'
+import RescaleFeatureInteraction from 'ol-rescale-feature'
 
 const point = new Feature({
   name: 'point',
@@ -172,26 +172,26 @@ const map = new Map({
 const select = new Select()
 select.getFeatures().extend([ point, line, polygon ])
 
-const rotate = new RotateFeatureInteraction({
+const rescale = new RescaleFeatureInteraction({
   features: select.getFeatures(),
   anchor: [ 0, 0 ],
   angle: -90 * Math.PI / 180
 })
 
-rotate.on('rotatestart', evt => console.log('rotate start', evt))
-rotate.on('rotating', evt => console.log('rotating', evt))
-rotate.on('rotateend', evt => console.log('rotate end', evt))
+rescale.on('rescalestart', evt => console.log('rescale start', evt))
+rescale.on('rescaling', evt => console.log('rescaling', evt))
+rescale.on('rescaleend', evt => console.log('rescale end', evt))
 
 map.addInteraction(select)
-map.addInteraction(rotate)
+map.addInteraction(rescale)
 ```
 
 Example of usage in Browser environment in [test/umd.html](https://github.com/ghettovoice/ol-rotate-feature/tree/master/test/umd.html).
 
-Getting total angle or last anchor coordinates after rotation:
+Getting total angle or last anchor coordinates after rescaling:
 
 ```js
-rotate.on('rotateend', evt => {
+rescale.on('rescaleend', evt => {
     // get total angle in degrees
     console.log(evt.angle + ' is '+ (-1 * evt.angle * 180 / Math.PI ) + '°')
     // get last anchor coordinates

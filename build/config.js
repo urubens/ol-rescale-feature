@@ -13,7 +13,7 @@ ${packageJson.description}
 */`
 
 module.exports = {
-  name: 'RotateFeatureInteraction',
+  name: 'RescaleFeatureInteraction',
   amdName: packageJson.name,
   env,
   version: packageJson.version,

@@ -15,7 +15,7 @@ import Fill from 'ol/style/Fill'
 import Stroke from 'ol/style/Stroke'
 import Text from 'ol/style/Text'
 import 'ol/ol.css'
-import RotateFeatureInteraction from '../src'
+import RescaleFeatureInteraction from '../src'
 
 const point = new Feature({
   name: 'point',
@@ -58,16 +58,16 @@ const map = new Map({
 const select = new Select()
 select.getFeatures().extend([ point, line, polygon ])
 
-const rotate = new RotateFeatureInteraction({
+const rotate = new RescaleFeatureInteraction({
   features: select.getFeatures(),
   anchor: [ 0, 0 ],
   angle: -90 * Math.PI / 180,
   style: createStyle ()
 })
 
-rotate.on('rotatestart', evt => console.log('rotate start', evt))
-rotate.on('rotating', evt => console.log('rotating', evt))
-rotate.on('rotateend', evt => console.log('rotate end', evt))
+rotate.on('rescalestart', evt => console.log('rescale start', evt))
+rotate.on('rescaling', evt => console.log('rescaling', evt))
+rotate.on('rescaleend', evt => console.log('rescale end', evt))
 
 map.addInteraction(select)
 map.addInteraction(rotate)
@@ -132,12 +132,12 @@ function createStyle () {
     let angle = feature.get('angle') || 0
 
     switch (true) {
-      case feature.get('rotate-anchor'):
+      case feature.get('rescale-anchor'):
         style = styles[ 'anchor' ]
         style[ 0 ].getImage().setRotation(-angle)
 
         return style
-      case feature.get('rotate-arrow'):
+      case feature.get('rescale-arrow'):
         style = styles[ 'arrow' ]
 
         let coordinates = feature.getGeometry().getCoordinates()
@@ -147,7 +147,7 @@ function createStyle () {
           [ coordinates[ 0 ], coordinates[ 1 ] + 100 * resolution ]
         ])
 
-        // and rotate it according to current angle
+        // and rescale it according to current angle
         geom.rotate(angle, coordinates)
         style[ 0 ].setGeometry(geom)
         style[ 1 ].setGeometry(geom)
