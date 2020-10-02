@@ -1,6 +1,6 @@
 {
   "name": "ol-rescale-feature",
-  "version": "2.2.1",
+  "version": "1.0.0",
   "description": "Rescale vector features interaction for OpenLayers",
   "main": "dist/bundle.js",
   "module": "dist/bundle.es.js",
@@ -22,16 +22,15 @@
     "map",
     "mapping"
   ],
-  "author": "Vladimir Vershinin <ghettovoice@gmail.com>",
+  "author": "Ulysse Rubens <ulyrubens@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ghettovoice/ol-rotate-feature.git"
+    "url": "git+https://github.com/urubens/ol-rescale-feature.git"
   },
   "bugs": {
-    "url": "https://github.com/ghettovoice/ol-rotate-feature/issues"
+    "url": "https://github.com/urubens/ol-rescale-feature/issues"
   },
-  "homepage": "https://ghettovoice.github.io/ol-rotate-feature/",
   "dependencies": {},
   "peerDependencies": {
     "ol": ">=5.0"
