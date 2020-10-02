@@ -6,12 +6,9 @@
 
 # Rescale feature interaction for OpenLayers
 
-Plugin adds interaction that allows to rotate vector features around some anchor.
+Plugin adds interaction that allows to rescale vector features around some anchor.
 
-### [Demo](https://ghettovoice.github.io/ol-rotate-feature/demo.html)
-
-**NOTE**: `ol-rescale-feature` starting from version **v2.x** supports `ol` **v5.x**. To use it with previous version of the OpenLayers `ol` package
-you should install **v1.x** version.
+**NOTE**: `ol-rescale-feature` version **12.x** supports `ol` **v5.x**. 
 
 ## Installation
 
@@ -73,7 +70,7 @@ In Browser environment you should add **script** tag pointing to **UMD** module 
 | :-------- | :------------------------------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | features  | _ol.Collection<ol.Feature>_                                                                        | The features the interaction works on. **Required**.                                                                                                                                        |
 | style     | _ol.style.Style &#124; Array&lt;ol.style.Style&gt; &#124; ol.style.StyleFunction &#124; undefined_ | Style of the overlay with interaction helper features.                                                                                                                                      |
-| factor    | _number &#124; undefined_                                                                          | Initial scaling factor, applied for features already added to collection. Default is `0`.                                                                                                   |
+| factor    | _number &#124; undefined_                                                                          | Initial scaling factor, applied for features already added to collection. Default is `1`.                                                                                                   |
 | anchor    | _number[] &#124; ol.Coordinate &#124; undefined_                                                   | Initial anchor coordinate. Default is center of features extent.                                                                                                                            |
 | condition | _module:ol/events/condition~Condition_                                                             | A function that takes an `module:ol/MapBrowserEvent~MapBrowserEvent` and returns a boolean to indicate whether that event should be handled. Default is `module:ol/events/condition~always` |
 
@@ -186,7 +183,6 @@ map.addInteraction(select)
 map.addInteraction(rescale)
 ```
 
-Example of usage in Browser environment in [test/umd.html](https://github.com/ghettovoice/ol-rotate-feature/tree/master/test/umd.html).
 
 Getting total scaling factor or last anchor coordinates after rescaling:
 
