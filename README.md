@@ -8,7 +8,9 @@
 
 Plugin adds interaction that allows to rescale vector features around some anchor.
 
-**NOTE**: `ol-rescale-feature` version **12.x** supports `ol` **v5.x**. 
+This plugin is heavily inspired from the amazing [ol-rotate-feature](https://github.com/ghettovoice/ol-rotate-feature) by [ghettovoice](https://github.com/ghettovoice).
+
+**NOTE**: `ol-rescale-feature` version **1.x** supports `ol` **v5.x**. 
 
 ## Installation
 
@@ -172,7 +174,7 @@ select.getFeatures().extend([ point, line, polygon ])
 const rescale = new RescaleFeatureInteraction({
   features: select.getFeatures(),
   anchor: [ 0, 0 ],
-  factor: -90 * Math.PI / 180
+  factor: 1
 })
 
 rescale.on('rescalestart', evt => console.log('rescale start', evt))
@@ -183,18 +185,8 @@ map.addInteraction(select)
 map.addInteraction(rescale)
 ```
 
-
-Getting total scaling factor or last anchor coordinates after rescaling:
-
-```js
-rescale.on('rescaleend', evt => {
-    // get total scaling factor in degrees
-    console.log(evt.factor + ' is '+ (-1 * evt.factor * 180 / Math.PI ) + '°')
-    // get last anchor coordinates
-    console.log(evt.anchor)
-})
-```
-
 ## License
 
-MIT (c) 2016-2018, Vladimir Vershinin
+MIT (c) 2016-2020, Vladimir Vershinin
+
+MIT (c) 2020, Ulysse Rubens
