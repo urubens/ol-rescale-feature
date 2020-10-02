@@ -15,7 +15,6 @@ import VectorLayer from 'ol/layer/Vector'
 import VectorSource from 'ol/source/Vector'
 import Feature from 'ol/Feature'
 import Point from 'ol/geom/Point'
-import Polygon from 'ol/geom/Polygon'
 import GeometryCollection from 'ol/geom/GeometryCollection'
 import Style from 'ol/style/Style'
 import RegularShape from 'ol/style/RegularShape'
@@ -27,6 +26,7 @@ import { always, mouseOnly } from 'ol/events/condition';
 import { assert, identity, includes, isArray } from './util'
 import RescaleFeatureEvent, { RescaleFeatureEventType } from './event'
 import { mouseActionButton } from './shim'
+import { distance } from 'ol/coordinate'
 
 const ANCHOR_KEY = 'rescale-anchor'
 const ARROW_KEY = 'rescale-arrow'
@@ -114,7 +114,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
     this.allowAnchorMovement = options.allowAnchorMovement === undefined ? true : options.allowAnchorMovement;
 
     this.setAnchor(options.anchor || getFeaturesCentroid(this.features_))
-    this.setFactor(options.factor || 0)
+    this.setFactor(options.factor || 1)
 
     this.features_.on('add', ::this.onFeatureAdd_)
     this.features_.on('remove', ::this.onFeatureRemove_)
@@ -303,7 +303,7 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
    * @private
    */
   resetFactor_() {
-    this.set(FACTOR_PROP, 0, true);
+    this.set(FACTOR_PROP, 1, true);
     this.arrowFeature_ && this.arrowFeature_.set(FACTOR_PROP, this.getFactor());
     this.anchorFeature_ && this.anchorFeature_.set(FACTOR_PROP, this.getFactor());
   }
@@ -348,7 +348,8 @@ export default class RescaleFeatureInteraction extends PointerInteraction {
    * @private
    */
   onFactorChange_({ oldValue }) {
-    this.features_.forEach(feature => feature.getGeometry().rotate(this.getFactor() - oldValue, this.getAnchor()))
+    let factor = this.getFactor() - oldValue
+    this.features_.forEach(feature => feature.getGeometry().scale(factor, factor, this.getAnchor()))
     this.arrowFeature_ && this.arrowFeature_.set(FACTOR_PROP, this.getFactor())
     this.anchorFeature_ && this.anchorFeature_.set(FACTOR_PROP, this.getFactor())
   }
@@ -514,23 +515,8 @@ function handleDragEvent ({ coordinate }) {
 
   // handle drag of features by scaling factor
   if (this.lastCoordinate_) {
-    // calculate vectors of last and current pointer positions
-    const lastVector = [
-      this.lastCoordinate_[ 0 ] - anchorCoordinate[ 0 ],
-      this.lastCoordinate_[ 1 ] - anchorCoordinate[ 1 ]
-    ]
-    const newVector = [
-      coordinate[ 0 ] - anchorCoordinate[ 0 ],
-      coordinate[ 1 ] - anchorCoordinate[ 1 ]
-    ]
-
-    // calculate angle between last and current vectors (positive angle counter-clockwise)
-    let angle = Math.atan2(
-      lastVector[ 0 ] * newVector[ 1 ] - newVector[ 0 ] * lastVector[ 1 ],
-      lastVector[ 0 ] * newVector[ 0 ] + lastVector[ 1 ] * newVector[ 1 ]
-    )
-
-    this.setFactor(this.getFactor() + angle)
+    let factor = distance(coordinate, anchorCoordinate) / distance(this.lastCoordinate_, anchorCoordinate)
+    this.setFactor(this.getFactor() + factor)
     this.dispatchRescalingEvent_(this.features_)
 
     this.lastCoordinate_ = coordinate
@@ -646,35 +632,13 @@ function getDefaultStyle () {
 
   return function (feature, resolution) {
     let style
-    const factor = feature.get(FACTOR_PROP) || 0
 
     switch (true) {
       case feature.get(ANCHOR_KEY):
         style = styles[ ANCHOR_KEY ]
-        style[ 0 ].getImage().setRotation(-factor)
-
         return style
       case feature.get(ARROW_KEY):
         style = styles[ ARROW_KEY ]
-
-        const coordinates = feature.getGeometry().getCoordinates()
-        // generate arrow polygon
-        const geom = new Polygon([
-          [
-            [ coordinates[ 0 ], coordinates[ 1 ] - 6 * resolution ],
-            [ coordinates[ 0 ] + 8 * resolution, coordinates[ 1 ] - 12 * resolution ],
-            [ coordinates[ 0 ], coordinates[ 1 ] + 30 * resolution ],
-            [ coordinates[ 0 ] - 8 * resolution, coordinates[ 1 ] - 12 * resolution ],
-            [ coordinates[ 0 ], coordinates[ 1 ] - 6 * resolution ],
-          ]
-        ])
-
-        // and rescale it according to current scaling factor
-        geom.rotate(factor, coordinates)
-        style[ 0 ].setGeometry(geom)
-        style[ 1 ].setGeometry(geom)
-        style[ 0 ].getText().setText(Math.round(-factor * 180 / Math.PI) + '°')
-
         return style
     }
   }
