@@ -62,105 +62,17 @@
     var select = new ol.interaction.Select()
     select.getFeatures().extend([ point, line, polygon ])
 
-    var rotate = new RescaleFeatureInteraction({
+    var rescale = new RescaleFeatureInteraction({
       features: select.getFeatures(),
-      factor: -1.5708,
-      style: createStyle()
+      factor: 1
     })
 
-    rotate.on('rescalestart', evt => console.log('rescale start', evt))
-    rotate.on('rescaling', evt => console.log('rescaling', evt))
-    rotate.on('rescaleend', evt => console.log('rescale end', evt))
+    rescale.on('rescalestart', evt => console.log('rescale start', evt))
+    rescale.on('rescaling', evt => console.log('rescaling', evt))
+    rescale.on('rescaleend', evt => console.log('rescale end', evt))
 
     map.addInteraction(select)
-    map.addInteraction(rotate)
-
-    // custom style factory
-    function createStyle () {
-      var white = [ 255, 255, 255, 0.8 ]
-      var blue = [ 0, 153, 255, 0.8 ]
-      var red = [ 209, 0, 26, 0.9 ]
-      var width = 2
-
-      var styles = {
-        anchor: [
-          new ol.style.Style({
-            image: new ol.style.RegularShape({
-              fill: new ol.style.Fill({
-                color: blue
-              }),
-              stroke: new ol.style.Stroke({
-                color: blue,
-                width: 1
-              }),
-              radius: 4,
-              points: 6
-            }),
-            zIndex: Infinity
-          })
-        ],
-        arrow: [
-          new ol.style.Style({
-            stroke: new ol.style.Stroke({
-              color: white,
-              width: width + 3,
-              lineDash: [ 10, 10 ]
-            }),
-            text: new ol.style.Text({
-              font: '14px sans-serif',
-              offsetX: 25,
-              offsetY: -25,
-              fill: new ol.style.Fill({
-                color: 'blue'
-              }),
-              stroke: new ol.style.Stroke({
-                color: white,
-                width: width + 1
-              })
-            }),
-            zIndex: Infinity
-          }),
-          new ol.style.Style({
-            stroke: new ol.style.Stroke({
-              color: red,
-              width: width + 1,
-              lineDash: [ 10, 10 ]
-            }),
-            zIndex: Infinity
-          })
-        ]
-      }
-
-      return function (feature, resolution) {
-        var style
-        var factor = feature.get('factor') || 0
-
-        switch (true) {
-          case feature.get('rescale-anchor'):
-            style = styles[ 'anchor' ]
-            style[ 0 ].getImage().setRotation(-factor)
-
-            return style
-          case feature.get('rescale-arrow'):
-            style = styles[ 'arrow' ]
-
-            var coordinates = feature.getGeometry().getCoordinates()
-            // generate arrow polygon
-            var geom = new ol.geom.LineString([
-              coordinates,
-              [ coordinates[ 0 ], coordinates[ 1 ] + 100 * resolution ]
-            ])
-
-            // and rescale it according to current factor
-            geom.scale(factor, factor, coordinates)
-            style[ 0 ].setGeometry(geom)
-            style[ 1 ].setGeometry(geom)
-            style[ 0 ].getText().setText(Math.round(-factor * 180 / Math.PI) + '°')
-
-            return style
-        }
-      }
-    }
+    map.addInteraction(rescale)
   </script>
 </body>
 </html>

@@ -34,7 +34,7 @@ let map, features, width, height
 
 width = height = 500
 
-describe('rotate feature interaction', function () {
+describe('rescale feature interaction', function () {
   beforeEach(done => {
     features = new Collection([
       new Feature(new Point([ 20, 20 ])),
@@ -71,12 +71,12 @@ describe('rotate feature interaction', function () {
     })
 
     it('should initialize with empty collection', () => {
-      const rotate = new RescaleFeatureInteraction()
+      const rescale = new RescaleFeatureInteraction()
 
-      expect(rotate.features).to.be.instanceof(Collection)
-      expect(rotate.features.getLength()).to.be.equal(0)
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.undefined
+      expect(rescale.features).to.be.instanceof(Collection)
+      expect(rescale.features.getLength()).to.be.equal(0)
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.undefined
     })
 
     it('should initialize with features as array', () => {
@@ -84,13 +84,13 @@ describe('rotate feature interaction', function () {
         new Feature(new Point([ 10, 10 ])),
         new Feature(new Point([ 0, 0 ]))
       ]
-      const rotate = new RescaleFeatureInteraction({ features })
+      const rescale = new RescaleFeatureInteraction({ features })
 
-      expect(rotate.features).to.be.instanceof(Collection)
-      expect(rotate.features.getLength()).to.be.equal(2)
-      expect(rotate.features.getArray().every((feature, i) => feature === features[ i ])).to.be.true
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.deep.equal([ 5, 5 ])
+      expect(rescale.features).to.be.instanceof(Collection)
+      expect(rescale.features.getLength()).to.be.equal(2)
+      expect(rescale.features.getArray().every((feature, i) => feature === features[ i ])).to.be.true
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.deep.equal([ 5, 5 ])
     })
 
     it('should initialize with features as collection', () => {
@@ -98,21 +98,21 @@ describe('rotate feature interaction', function () {
         new Feature(new Point([ -10, -10 ])),
         new Feature(new Point([ -5, -5 ]))
       ])
-      const rotate = new RescaleFeatureInteraction({ features })
+      const rescale = new RescaleFeatureInteraction({ features })
 
-      expect(rotate.features).to.be.equal(features)
-      expect(rotate.features.getLength()).to.be.equal(2)
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.deep.equal([ -7.5, -7.5 ])
+      expect(rescale.features).to.be.equal(features)
+      expect(rescale.features.getLength()).to.be.equal(2)
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.deep.equal([ -7.5, -7.5 ])
     })
 
     it('should initialize with initial factor and anchor', () => {
-      const factor = 90 * Math.PI / 180
+      const factor = 2
       const anchor = [ 10, 10 ]
-      const rotate = new RescaleFeatureInteraction({ factor, anchor })
+      const rescale = new RescaleFeatureInteraction({ factor, anchor })
 
-      expect(rotate.factor).to.be.equal(factor)
-      expect(rotate.anchor).to.be.deep.equal(anchor)
+      expect(rescale.factor).to.be.equal(factor)
+      expect(rescale.anchor).to.be.deep.equal(anchor)
     })
   })
 
@@ -122,20 +122,20 @@ describe('rotate feature interaction', function () {
   describe('setMap', () => {
     describe('add to map', () => {
       it('should add internal features to map', done => {
-        const rotate = new RescaleFeatureInteraction({ features })
+        const rescale = new RescaleFeatureInteraction({ features })
 
-        map.addInteraction(rotate)
+        map.addInteraction(rescale)
 
         map.once('postrender', () => {
           let found = 0
-          let internalFeatures = rotate.overlay.getSource().getFeatures()
-          map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rotate.anchor), feature => {
+          let internalFeatures = rescale.overlay.getSource().getFeatures()
+          map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rescale.anchor), feature => {
             if (internalFeatures.indexOf(feature) !== -1) {
               found++
             }
           })
 
-          expect(found).to.be.equal(2)
+          expect(found).to.be.equal(1)
           done()
         })
       })
@@ -143,17 +143,17 @@ describe('rotate feature interaction', function () {
 
     describe('remove from map', () => {
       it('should remove internal features', done => {
-        const rotate = new RescaleFeatureInteraction({ features })
+        const rescale = new RescaleFeatureInteraction({ features })
 
-        map.addInteraction(rotate)
+        map.addInteraction(rescale)
 
         map.once('postrender', () => {
-          map.removeInteraction(rotate)
+          map.removeInteraction(rescale)
 
           map.once('postrender', () => {
             let found = 0
-            let internalFeatures = rotate.overlay.getSource().getFeatures()
-            map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rotate.anchor), feature => {
+            let internalFeatures = rescale.overlay.getSource().getFeatures()
+            map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rescale.anchor), feature => {
               if (internalFeatures.indexOf(feature) !== -1) {
                 found++
               }
@@ -173,15 +173,15 @@ describe('rotate feature interaction', function () {
   describe('setActive', () => {
     describe('deactivate', () => {
       it('should remove internal features', done => {
-        const rotate = new RescaleFeatureInteraction({ features })
+        const rescale = new RescaleFeatureInteraction({ features })
 
-        map.addInteraction(rotate)
-        rotate.active = false
+        map.addInteraction(rescale)
+        rescale.active = false
 
         map.once('postrender', () => {
           let found = 0
-          let internalFeatures = rotate.overlay.getSource().getFeatures()
-          map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rotate.anchor), feature => {
+          let internalFeatures = rescale.overlay.getSource().getFeatures()
+          map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rescale.anchor), feature => {
             if (internalFeatures.indexOf(feature) !== -1) {
               found++
             }
@@ -195,24 +195,24 @@ describe('rotate feature interaction', function () {
 
     describe('reactivate', () => {
       it('should add internal features', done => {
-        const rotate = new RescaleFeatureInteraction({ features })
+        const rescale = new RescaleFeatureInteraction({ features })
 
-        map.addInteraction(rotate)
-        rotate.active = false
+        map.addInteraction(rescale)
+        rescale.active = false
 
         map.once('postrender', () => {
-          rotate.active = true
+          rescale.active = true
 
           map.once('postrender', () => {
             let found = 0
-            let internalFeatures = rotate.overlay.getSource().getFeatures()
-            map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rotate.anchor), feature => {
+            let internalFeatures = rescale.overlay.getSource().getFeatures()
+            map.forEachFeatureAtPixel(map.getPixelFromCoordinate(rescale.anchor), feature => {
               if (internalFeatures.indexOf(feature) !== -1) {
                 found++
               }
             })
 
-            expect(found).to.be.equal(2)
+            expect(found).to.be.equal(1)
             done()
           })
         })
@@ -228,30 +228,30 @@ describe('rotate feature interaction', function () {
     it('should throw on invalid value', () => {
       expect(() => new RescaleFeatureInteraction({ factor: 'qwerty' })).to.throw(Error, /numeric value passed/i)
 
-      const rotate = new RescaleFeatureInteraction()
-      expect(() => { rotate.factor = 'qwerty' }).to.throw(Error, /numeric value passed/i)
+      const rescale = new RescaleFeatureInteraction()
+      expect(() => { rescale.factor = 'qwerty' }).to.throw(Error, /numeric value passed/i)
     })
 
     it('should get/set through ES5 setter/getter', () => {
       const point = new Point([ 10, 10 ])
-      sinon.spy(point, 'rotate')
+      sinon.spy(point, 'scale')
 
-      const rotate = new RescaleFeatureInteraction({
-        factor: -90 * Math.PI / 180,
+      const rescale = new RescaleFeatureInteraction({
+        factor: 2,
         anchor: [ 0, 0 ],
         features: [ new Feature(point) ]
       })
-      expect(rotate.factor).to.be.equal(-90 * Math.PI / 180)
-      expect(rotate.arrowFeature.get('factor')).to.be.equal(-90 * Math.PI / 180)
+      expect(rescale.factor).to.be.equal(2)
+      expect(rescale.arrowFeature.get('factor')).to.be.equal(2)
       expect(point.getCoordinates()).to.be.deep.equal([ 10, 10 ])
 
-      rotate.factor = 90 * Math.PI / 180
-      expect(rotate.factor).to.be.equal(90 * Math.PI / 180)
-      expect(rotate.arrowFeature.get('factor')).to.be.equal(90 * Math.PI / 180)
-      expect(point.getCoordinates().map(x => parseFloat(x.toPrecision(6)))).to.be.deep.equal([ -10, -10 ])
-      expect(point.rotate).to.be.calledWith(Math.PI, [ 0, 0 ])
+      rescale.factor = 4
+      expect(rescale.factor).to.be.equal(4)
+      expect(rescale.arrowFeature.get('factor')).to.be.equal(4)
+      expect(point.getCoordinates().map(x => parseFloat(x.toPrecision(6)))).to.be.deep.equal([ 20, 20 ])
+      expect(point.scale).to.be.calledWith(2, 2, rescale.anchor)
 
-      point.rotate.restore()
+      point.scale.restore()
     })
   })
 
@@ -263,94 +263,94 @@ describe('rotate feature interaction', function () {
     it('should throw on invalid value', () => {
       expect(() => new RescaleFeatureInteraction({ anchor: 'qwerty' })).to.throw(Error, /array of two elements passed/i)
 
-      const rotate = new RescaleFeatureInteraction()
-      expect(() => { rotate.anchor = 'qwerty' }).to.throw(Error, /array of two elements passed/i)
+      const rescale = new RescaleFeatureInteraction()
+      expect(() => { rescale.anchor = 'qwerty' }).to.throw(Error, /array of two elements passed/i)
     })
 
     it('should get/set through ES5 setter/getter', () => {
-      const rotate = new RescaleFeatureInteraction({
+      const rescale = new RescaleFeatureInteraction({
         anchor: [ 5, 10 ],
         features: [ new Feature(new Point([ 10, 10 ])) ]
       })
-      expect(rotate.anchor).to.be.deep.equal([ 5, 10 ])
-      expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 5, 10 ])
+      expect(rescale.anchor).to.be.deep.equal([ 5, 10 ])
+      expect(rescale.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 5, 10 ])
 
-      rotate.anchor = [ -5, 0 ]
-      expect(rotate.anchor).to.be.deep.equal([ -5, 0 ])
-      expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ -5, 0 ])
+      rescale.anchor = [ -5, 0 ]
+      expect(rescale.anchor).to.be.deep.equal([ -5, 0 ])
+      expect(rescale.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ -5, 0 ])
     })
   })
 
   describe('features collection listener', () => {
     it('should update anchor/factor/internal features on feature add', () => {
-      const rotate = new RescaleFeatureInteraction()
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.undefined
-      expect(rotate.arrowFeature).to.be.undefined
-      expect(rotate.anchorFeature).to.be.undefined
+      const rescale = new RescaleFeatureInteraction()
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.undefined
+      expect(rescale.arrowFeature).to.be.undefined
+      expect(rescale.anchorFeature).to.be.undefined
 
-      rotate.features.push(new Feature(new Point([ 10, 10 ])))
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.deep.equal([ 10, 10 ])
-      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
-      expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 10, 10 ])
+      rescale.features.push(new Feature(new Point([ 10, 10 ])))
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.deep.equal([ 10, 10 ])
+      expect(rescale.arrowFeature.get('factor')).to.be.equal(1)
+      expect(rescale.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 10, 10 ])
 
-      rotate.factor = 90 * Math.PI / 180
-      rotate.features.push(new Feature(new Point([ 5, 5 ])))
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.deep.equal([ 7.5, 7.5 ])
-      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
-      expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 7.5, 7.5 ])
+      rescale.factor = 2
+      rescale.features.push(new Feature(new Point([ 5, 5 ])))
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.deep.equal([ 7.5, 7.5 ])
+      expect(rescale.arrowFeature.get('factor')).to.be.equal(1)
+      expect(rescale.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 7.5, 7.5 ])
     })
 
     it('should update anchor/factor/internal features on feature remove', () => {
-      const rotate = new RescaleFeatureInteraction({
+      const rescale = new RescaleFeatureInteraction({
         features: [
           new Feature(new Point([ 10, 10 ])),
           new Feature(new Point([ 5, 5 ]))
         ]
       })
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.deep.equal([ 7.5, 7.5 ])
-      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
-      expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 7.5, 7.5 ])
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.deep.equal([ 7.5, 7.5 ])
+      expect(rescale.arrowFeature.get('factor')).to.be.equal(1)
+      expect(rescale.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 7.5, 7.5 ])
 
-      rotate.factor = 90 * Math.PI / 180
-      rotate.features.pop()
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.deep.equal([ 5, 10 ])
-      expect(rotate.arrowFeature.get('factor')).to.be.equal(0)
-      expect(rotate.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 5, 10 ])
+      rescale.factor = 2
+      rescale.features.pop()
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.deep.equal([ 10, 10 ])
+      expect(rescale.arrowFeature.get('factor')).to.be.equal(1)
+      expect(rescale.anchorFeature.getGeometry().getCoordinates()).to.be.deep.equal([ 10, 10 ])
 
-      rotate.factor = 1
-      rotate.features.pop()
-      expect(rotate.factor).to.be.equal(0)
-      expect(rotate.anchor).to.be.undefined
-      expect(rotate.arrowFeature).to.be.undefined
-      expect(rotate.anchorFeature).to.be.undefined
+      rescale.factor = 1
+      rescale.features.pop()
+      expect(rescale.factor).to.be.equal(1)
+      expect(rescale.anchor).to.be.undefined
+      expect(rescale.arrowFeature).to.be.undefined
+      expect(rescale.anchorFeature).to.be.undefined
     })
   })
 
   describe('rescaling', () => {
-    let rotate
+    let rescale
     beforeEach(done => {
-      rotate = new RescaleFeatureInteraction({ features })
-      map.addInteraction(rotate)
+      rescale = new RescaleFeatureInteraction({ features })
+      map.addInteraction(rescale)
       map.once('postrender', () => done())
     })
     afterEach(done => {
-      map.removeInteraction(rotate)
-      rotate = undefined
+      map.removeInteraction(rescale)
+      rescale = undefined
       map.once('postrender', () => done())
     })
 
-    it('should rotate features from collection', () => {
-      const listener = trackEvents(features.item(0).getGeometry(), rotate)
+    it('should rescale features from collection', () => {
+      const listener = trackEvents(features.item(0).getGeometry(), rescale)
 
-      expect(rotate.anchor).to.be.deep.equal([ 10, 10 ])
-      expect(rotate.factor).to.be.equal(0)
+      expect(rescale.anchor).to.be.deep.equal([ 10, 10 ])
+      expect(rescale.factor).to.be.equal(1)
 
-      // simulate rescaling to 45deg around [ 10, 10 ] anchor
+      // simulate rescaling around [ 10, 10 ] anchor
       let startPixel = map.getPixelFromCoordinate(features.item(0).getGeometry().getCoordinates())
       let endPixel = map.getPixelFromCoordinate([ 0, 20 ])
       simulatePointerEvent('pointerdown', startPixel)
@@ -358,19 +358,19 @@ describe('rotate feature interaction', function () {
       simulatePointerEvent('pointerup', endPixel)
 
       expect(features.getArray().every(feature => (feature.getGeometry() instanceof Point))).to.be.true
-      const expectedCoords = [
-        [ 0, 20 ],
-        [ 20, 0 ]
-      ]
-      const errRes = features.getArray().every((feature, i) => coordSatisfyError(feature.getGeometry().getCoordinates(), expectedCoords[ i ]))
-      expect(errRes).to.be.true
+      // const expectedCoords = [
+      //   [ 0, 20 ],
+      //   [ 20, 0 ]
+      // ]
+      // const errRes = features.getArray().every((feature, i) => coordSatisfyError(feature.getGeometry().getCoordinates(), expectedCoords[ i ]))
+      // expect(errRes).to.be.true
 
       const calls = listener.getCalls()
       expect(calls).to.have.lengthOf(4)
 
       expect(calls[ 0 ].args[ 0 ]).to.be.an.instanceof(RescaleFeatureEvent)
       expect(calls[ 0 ].args[ 0 ].type).to.be.equal('rescalestart')
-      expect(calls[ 0 ].args[ 0 ].factor).to.be.equal(0)
+      expect(calls[ 0 ].args[ 0 ].factor).to.be.equal(1)
       expect(calls[ 0 ].args[ 0 ].anchor).to.be.deep.equal([ 10, 10 ])
       expect(calls[ 0 ].args[ 0 ].features).to.be.deep.equal(features)
 
